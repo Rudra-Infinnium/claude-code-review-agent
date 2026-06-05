@@ -21,49 +21,62 @@ The agent is **read-only** — it never edits source files. The only file it wri
 
 - [Claude Code](https://claude.com/claude-code) installed
 - Access to the Claude **Opus** model (the agent is configured to use `claude-opus-4-7`)
+- Git installed (to clone this repo)
 
-## Installation
+## Installation (Windows / PowerShell)
 
-There are two ways to install it. Pick one.
+The simplest path: clone this repo once, then copy the agent file into either your user folder (available everywhere) or into a specific project (shared with the project's team).
 
-### Option A — Per project (recommended for teams)
+### Step 1 — Clone the repo
 
-Copy the agent into the project you want reviewed. Anyone who clones the project gets the agent automatically.
+```powershell
+git clone https://github.com/Rudra-Infinnium/claude-code-review-agent.git
+```
+
+### Step 2 — Pick an install scope
+
+**Option A — Personal install** (agent available in *all* your projects)
+
+```powershell
+New-Item -ItemType Directory -Force "$HOME\.claude\agents" | Out-Null
+Copy-Item "claude-code-review-agent\.claude\agents\python-code-reviewer.md" "$HOME\.claude\agents\"
+```
+
+**Option B — Per-project install** (commit the agent so your teammates get it on `git pull`)
+
+From inside the target Python project:
+
+```powershell
+New-Item -ItemType Directory -Force ".claude\agents" | Out-Null
+Copy-Item "..\claude-code-review-agent\.claude\agents\python-code-reviewer.md" ".claude\agents\"
+git add .claude\agents\python-code-reviewer.md
+git commit -m "Add python-code-reviewer agent"
+git push
+```
+
+(Adjust the source path in `Copy-Item` to wherever you cloned the repo.)
+
+## Installation (macOS / Linux)
+
+<details>
+<summary>Click to expand</summary>
 
 ```bash
-# from inside your target project
-mkdir -p .claude/agents
-curl -o .claude/agents/python-code-reviewer.md \
-  https://raw.githubusercontent.com/<your-org>/claude-code-review-agent/main/.claude/agents/python-code-reviewer.md
+git clone https://github.com/Rudra-Infinnium/claude-code-review-agent.git
 
+# Option A — personal install
+mkdir -p ~/.claude/agents
+cp claude-code-review-agent/.claude/agents/python-code-reviewer.md ~/.claude/agents/
+
+# Option B — per-project install (run from inside the target project)
+mkdir -p .claude/agents
+cp ../claude-code-review-agent/.claude/agents/python-code-reviewer.md .claude/agents/
 git add .claude/agents/python-code-reviewer.md
 git commit -m "Add python-code-reviewer agent"
+git push
 ```
 
-On Windows PowerShell:
-
-```powershell
-New-Item -ItemType Directory -Force .claude\agents
-Invoke-WebRequest `
-  -Uri "https://raw.githubusercontent.com/<your-org>/claude-code-review-agent/main/.claude/agents/python-code-reviewer.md" `
-  -OutFile ".claude\agents\python-code-reviewer.md"
-```
-
-### Option B — Personal install (available in all your projects)
-
-Drop the agent into your global Claude Code agents folder.
-
-**Linux / macOS:**
-```bash
-mkdir -p ~/.claude/agents
-cp .claude/agents/python-code-reviewer.md ~/.claude/agents/
-```
-
-**Windows PowerShell:**
-```powershell
-New-Item -ItemType Directory -Force "$HOME\.claude\agents"
-Copy-Item ".claude\agents\python-code-reviewer.md" "$HOME\.claude\agents\"
-```
+</details>
 
 ## Usage
 
@@ -92,15 +105,15 @@ The agent is just a Markdown file with YAML frontmatter at `.claude/agents/pytho
 | `name` | Identifier used to invoke the agent |
 | `description` | How Claude decides when to auto-invoke this agent |
 | `tools` | Which Claude Code tools the agent may use (read-only by default) |
-| `model` | Which Claude model runs the agent (`opus`, `sonnet`, `haiku`, or a pinned ID) |
+| `model` | Which Claude model runs the agent (`opus`, `sonnet`, `haiku`, or a pinned ID like `claude-opus-4-7`) |
 
 The body below the frontmatter is the system prompt — adjust focus areas, output format, and rules to match your team's standards.
 
 ## Sharing with your team
 
-1. Fork or clone this repo into your team's git host
-2. Send teammates the install command from the **Installation** section above
-3. Or — copy `.claude/agents/python-code-reviewer.md` directly into any team project repo and commit it; teammates get it on `git pull`
+1. Make sure your teammates have access to this private repo (Settings → Collaborators on GitHub).
+2. Send them this README link and the *Installation (Windows / PowerShell)* steps above.
+3. For projects where you want the agent to ship with the code itself, use **Option B (per-project install)** and commit the agent file — then anyone who clones that project gets the agent automatically.
 
 ## License
 
